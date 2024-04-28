@@ -8,15 +8,16 @@ const CustomCanvas = ({ image, backgroundColor, adContent, cta }) => {
       text: "1 & 2 BHK Luxury Apartments at just Rs.34.97 Lakhs",
       position: { x: 50, y: 50 },
       max_characters_per_line: 31,
-      font_size: 44,
+      font_size: 10,
       alignment: "left",
-      text_color: "#FFFFFF",
+      
+      text_color: "#000000",
     },
     cta: {
       text: "Shop Now",
       position: { x: 190, y: 320 },
-      text_color: "#FFFFFF",
-      background_color: "#000000",
+      text_color: "#000000",
+      background_color: "#FFFFFF",
     },
     image_mask: {
       x: 56,
@@ -42,68 +43,91 @@ const CustomCanvas = ({ image, backgroundColor, adContent, cta }) => {
     const ctx = canvas.getContext("2d");
 
     const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      if (image) {
-        const img1 = new Image();
-        img1.onload = () => {
-          drawRoundedImage(img1, 40, 20, 340, 280, 30);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+        if (image) {
+            const img1 = new Image();
+            img1.onload = () => {
+                drawRoundedImage(img1, 40, 20, 340, 280, 30);
+            };
+            img1.src = image;
+        }
+    
+        const drawRoundedImage = (img, x, y, width, height, radius) => {
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.arcTo(x + width, y, x + width, y + height, radius);
+            ctx.arcTo(x + width, y + height, x, y + height, radius);
+            ctx.arcTo(x, y + height, x, y, radius);
+            ctx.arcTo(x, y, x + width, y, radius);
+            ctx.closePath();
+            ctx.clip();
+            ctx.drawImage(img, x, y, width, height);
+            ctx.restore();
         };
-        img1.src = image;
+    
+        const ctaWidth = 180;
+        const ctaHeight = 40;
+    
+        ctx.beginPath();
+        ctx.rect(140, 15, 250, 350);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "black";
+        ctx.lineCap = "round";
+        ctx.stroke();
+    
+        ctx.beginPath();
+        ctx.moveTo(170, 10);
+        ctx.lineTo(420, 430);
+        ctx.lineWidth = 250;
+        ctx.strokeStyle = backgroundColor;
+        ctx.stroke();
+
+
+        const adContentLines = [];
+      let currentLine = "";
+      for (let i = 0; i < adContent.length; i++) {
+        currentLine += adContent[i];
+        if (currentLine.length === 15 || i === adContent.length - 1) {
+          adContentLines.push(currentLine);
+          currentLine = "";
+        }
       }
 
-      const drawRoundedImage = (img, x, y, width, height, radius) => {
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(x + radius, y);
-        ctx.arcTo(x + width, y, x + width, y + height, radius);
-        ctx.arcTo(x + width, y + height, x, y + height, radius);
-        ctx.arcTo(x, y + height, x, y, radius);
-        ctx.arcTo(x, y, x + width, y, radius);
-        ctx.closePath();
-        ctx.clip();
-        ctx.drawImage(img, x, y, width, height);
-        ctx.restore();
-      };
-      ctx.beginPath();
-      ctx.rect(140, 15, 250, 350);
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = "black";
-      ctx.lineCap = "round";
-
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(170, 10);
-      ctx.lineTo(420, 430);
-      ctx.lineWidth = 250;
-      ctx.strokeStyle = backgroundColor;
-      ctx.stroke();
-
       ctx.fillStyle = defaultData.caption.text_color;
-      ctx.font = `20px Arial`;
+      ctx.font = `13px Arial`;
       ctx.textAlign = defaultData.caption.alignment;
-      ctx.fillText(adContent, 0, canvas.height - 70,400);
+      adContentLines.forEach((line, index) => {
+        ctx.fillText(line, 10, canvas.height - 90 + (index * 20));
+      });
+    
+        // ctx.fillStyle = defaultData.caption.text_color;
+        // ctx.font = `13px Arial`;
+        // ctx.textAlign = defaultData.caption.alignment;
+        // ctx.fillText(adContent, 20, canvas.height - 70);
+    
+        ctx.fillStyle = defaultData.cta.background_color;
+        ctx.fillRect(
+            defaultData.cta.position.x,
+            defaultData.cta.position.y,
+            ctaWidth,
+            ctaHeight
+        );
+    
+        ctx.fillStyle = defaultData.cta.text_color;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = `${defaultData.cta.font_size || 20}px Arial`;
+        ctx.fillText(
+            cta,
+            defaultData.cta.position.x + ctaWidth / 2,
+            defaultData.cta.position.y + ctaHeight / 2
+        );
 
-      const ctaWidth = 180;
-      const ctaHeight = 40;
-      ctx.fillRect(
-        defaultData.cta.position.x,
-        defaultData.cta.position.y,
-        ctaWidth,
-        ctaHeight
-      );
-      ctx.fillStyle = defaultData.cta.background_color;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.font = `${defaultData.cta.font_size || 30}px Arial`;
-      ctx.fillText(
-        cta,
-        defaultData.cta.position.x + ctaWidth / 2,
-        defaultData.cta.position.y + ctaHeight / 2
-      );
+        
     };
-
+    
     draw();
   }, [image, backgroundColor, adContent, cta]);
 
